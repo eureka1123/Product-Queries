@@ -13,6 +13,5 @@ def lazy_json_read_line(line):
     except:
         return "error"
 
-
 for line in file_request.iter_lines():
     print(lazy_json_read_line(line))
