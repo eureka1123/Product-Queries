@@ -32,7 +32,7 @@ f.close()
 
 def check_not_all_capitalized(tokenized):
     for word in tokenized:
-        if word.isupper() or word.islower():
+        if word.islower():
             return True
     return False
 
