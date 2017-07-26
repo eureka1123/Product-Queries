@@ -20,11 +20,14 @@ def lazy_json_read_line(line):
     except:
         return "error"
 
+f = open('tpdb.txt', 'w').close()
 f = open("tpdb.txt", "a")
 
 for line in file_request.iter_lines():
     f.write(lazy_json_read_line(line))
     f.write("\n")
+
+f.close()
 
 def create_data_structure(long_string):
     st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
