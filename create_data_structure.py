@@ -19,10 +19,19 @@ def create_data_structure(long_string):
     	tagged = st.tag(tocanized)
 	sentences_with_tag.append(tagged)
 	
-	for (word, tag) in tagged:
-	    if word not in main_data_structure:
-		main_data_structure[word] = [sentence_index]
-	    else:
-		main_data_structure[word].append(sentence_index)
+	for word_index in range(len(tagged)):
+	    word = tagged[word_index][0]
 
-    return (main_data_structure, sentences_with_tag) 
+	    if word not in main_data_structure:
+		main_data_structure[word] = [(sentence_index, word_index)]
+	    else:
+		main_data_structure[word].append((sentence_index, word_index))
+
+    return (main_data_structure, sentences_with_tag)
+
+#sample_string = "Some things never change. Do they?"
+
+#data, sentences = create_data_structure(sample_string)
+
+#print(data)
+#print(sentences)
