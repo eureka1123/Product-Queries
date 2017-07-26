@@ -15,8 +15,8 @@ def create_data_structure(long_string):
     sentences = re.split("\. |\n", long_string)
     print("sentences",sentences)    
     for sentence_index in range(len(sentences)): 
-        tocanized = nltk.word_tokenize(sentences[sentence_index])
-    	tagged = st.tag(tocanized)
+        tokenized = nltk.word_tokenize(sentences[sentence_index])
+    	tagged = st.tag(tokenized)
 	sentences_with_tag.append(tagged)
 	
 	for word_index in range(len(tagged)):
