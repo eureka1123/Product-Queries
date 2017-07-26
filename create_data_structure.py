@@ -44,15 +44,23 @@ def create_data_structure(long_string):
 	    word = tagged[word_index][0]
 
 	    if word not in main_data_structure:
-		main_data_structure[word] = [(sentence_index, word_index)]
+		main_data_structure[word] = {}
+		if sentence_index not in main_data_structure[word]:
+		    main_data_structure[word][sentence_index] =  [word_index]
+		else:
+		    main_data_structure[word][sentence_index].append(word_index)
 	    else:
-		main_data_structure[word].append((sentence_index, word_index))
+		#main_data_structure[word].append((sentence_index, word_index))
+		if sentence_index not in main_data_structure[word]:
+                    main_data_structure[word][sentence_index] =  [word_index]
+                else:
+                    main_data_structure[word][sentence_index].append(word_index)
 
     return (main_data_structure, sentences_with_tag)
 
-#sample_string = "Some things never change. Do they?"
+sample_string = "Some things never change. Do they? never"
 
-#data, sentences = create_data_structure(sample_string)
+data, sentences = create_data_structure(sample_string)
 
-#print(data)
-#print(sentences)
+print(data)
+print(sentences)
