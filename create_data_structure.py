@@ -9,9 +9,11 @@ url = "http://pcsync-01/" + client + "/pcf_catalog.json"
 file_request = requests.get(url, stream = True)
 
 username = "xiaoluguo"
-_path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger" 
-_path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
-
+root = "/home/" + username + "/Product-Queries/"
+_path_to_model = root +  "stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger" 
+_path_to_jar = root + "stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
+tpdb_file_pre = root + client + "_tpdb_pre.txt"
+tpdb_file = root + client + "_tpdb.txt"
 
 def lazy_json_read_line(line):
     try:
@@ -21,8 +23,8 @@ def lazy_json_read_line(line):
     except:
         return "error"
 
-f = open(client + "_tpdb.txt", "w").close()
-f = open(client + "_tpdb.txt", "a")
+f = open(tpdb_file_pre, "w").close()
+f = open(tpdb_file_pre, "a")
 
 for line in file_request.iter_lines():
     f.write(lazy_json_read_line(line))
@@ -66,9 +68,21 @@ def create_data_structure(long_string):
 
     return (main_data_structure, sentences_with_tag)
 
+with open(tpdb_file_pre) as myfile:
+    corpus = myfile.read()
+
+corpus_parse = sc.parallelize(re.split("\n", corpus))
+corpus_tpdb = corpus_parse.map(lambda x : create_data_structure(x))
+
+f = open(tpdb_file, "w")
+f.write(corpus_tpdb)
+f.close()
+
+print(corpus)
+
 sample_string = "Some things never change. Do they? never"
 
-data, sentences = create_data_structure(sample_string)
+data, sentences = create_data_structure(corpus)
 
 print(data)
 print(sentences)
