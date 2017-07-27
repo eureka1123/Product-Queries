@@ -3,6 +3,7 @@ import nltk
 import re
 import requests
 import json
+from multiprocessing.pool import ThreadPool as Pool
 
 client = "shoppersstop.com"
 url = "http://pcsync-01/" + client + "/pcf_catalog.json"
@@ -14,6 +15,8 @@ _path_to_model = root +  "stanford_tagger_files/stanford-postagger-2017-06-09/mo
 _path_to_jar = root + "stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
 tpdb_file_pre = root + client + "_tpdb_pre.txt"
 tpdb_file = root + client + "_tpdb.txt"
+
+pool = Pool(4)
 
 def lazy_json_read_line(line):
     try:
@@ -38,51 +41,50 @@ def check_not_all_capitalized(tokenized):
             return True
     return False
 
+main_data_structure = {}
+sentences_with_tag = []
+
+f = open(tpdb_file, "w").close()
+f = open(tpdb_file, "a")
+
 def create_data_structure(long_string):
     st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
-    main_data_structure = {}    
-    sentences_with_tag = []
     sentences = re.split("\. |\n", long_string)
-    print("sentences",sentences)    
-    for sentence_index in range(len(sentences)): 
+    # print("sentences",sentences)
+    for sentence_index in range(len(sentences)):
         tokenized = nltk.word_tokenize(sentences[sentence_index])
-	if check_not_all_capitalized(tokenized):
-	    tagged = st.tag(tokenized)
-	    sentences_with_tag.append(tagged)
-	    
-	    for word_index in range(len(tagged)):
-		word = tagged[word_index][0]
+        if check_not_all_capitalized(tokenized):
+            tagged = st.tag(tokenized)
+            sentences_with_tag.append(tagged)
+            print(tagged)
+            f.write(str(tagged).strip('[]'))
+            f.write("\n")
 
-		if word not in main_data_structure:
-		    main_data_structure[word] = {}
-		    if sentence_index not in main_data_structure[word]:
-			main_data_structure[word][sentence_index] =  [word_index]
-		    else:
-			main_data_structure[word][sentence_index].append(word_index)
-		else:
-		    #main_data_structure[word].append((sentence_index, word_index))
-		    if sentence_index not in main_data_structure[word]:
-			main_data_structure[word][sentence_index] =  [word_index]
-		    else:
-			main_data_structure[word][sentence_index].append(word_index)
+            for word_index in range(len(tagged)):
+                word = tagged[word_index][0]
+
+                if word not in main_data_structure:
+                    main_data_structure[word] = {}
+                    if sentence_index not in main_data_structure[word]:
+                        main_data_structure[word][sentence_index] =  [word_index]
+                    else:
+                        main_data_structure[word][sentence_index].append(word_index)
+                else:
+                    #main_data_structure[word].append((sentence_index, word_index))
+                    if sentence_index not in main_data_structure[word]:
+                        main_data_structure[word][sentence_index] =  [word_index]
+                    else:
+                        main_data_structure[word][sentence_index].append(word_index)
 
     return (main_data_structure, sentences_with_tag)
 
 with open(tpdb_file_pre) as myfile:
     corpus = myfile.read()
 
-corpus_parse = sc.parallelize(re.split("\n", corpus))
-corpus_tpdb = corpus_parse.map(lambda x : create_data_structure(x))
-
-f = open(tpdb_file, "w")
-f.write(corpus_tpdb)
-f.close()
-
-print(corpus)
-
 sample_string = "Some things never change. Do they? never"
 
-data, sentences = create_data_structure(corpus)
+T = pool.map(create_data_structure(corpus))
+f.close()
 
 print(data)
 print(sentences)
