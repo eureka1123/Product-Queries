@@ -9,11 +9,15 @@ _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stan
 # _path_to_model = "/Users/abishkarchhetri/Downloads/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 # _path_to_jar = "/Users/abishkarchhetri/Downloads/stanford-postagger-2017-06-09/stanford-postagger.jar"
 
-def create_data_structure(long_string):
-    st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
+st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
+
+def create_data_structure(list_string):
+    #st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
     main_data_structure = {}
     sentences_with_tag = []
-    sentences = re.split("\. |\n", long_string)
+    sentences = []
+    for par in list_string:
+        sentences.extend(re.split("\. |\n", par))
     #print("sentences",sentences)
     for sentence_index in range(len(sentences)):
         tokenized = word_tokenize(sentences[sentence_index])
@@ -21,7 +25,7 @@ def create_data_structure(long_string):
         sentences_with_tag.append(tagged)
 
         for word_index in range(len(tagged)):
-            word = tagged[word_index][0]
+            word = str(tagged[word_index][0]).lower()
 
             if word not in main_data_structure:
                 main_data_structure[word] = {}
@@ -38,11 +42,17 @@ def create_data_structure(long_string):
 
     return (main_data_structure, sentences_with_tag)
 
-sample_corpus = "Epitome of style and trend, this t-shirt is a must-have. The all over graphical print takes it a notch higher on the style scale. It comes with short side-slits and dolman sleeves for an added allure.\nHow To Use: Apply directly onto the lips from the tube or use the Retractable Lip Brush for a more precise application.\nCarry your essentials in style by using this sling bag from Hidesign. It comes with a long strap, which will help you to carry it with ease. It also features one main compartment that will provide you adequate space to keep your stuff in place. Moreover, it has been made of premium quality leather that makes it easy to maintain."
+sample_corpus = ["Epitome of style and trend, this t-shirt is a must-have. The all over graphical print takes it a notch higher on the style scale. It comes with short side-slits and dolman sleeves for an added allure.\nHow To Use: Apply directly onto the lips from the tube or use the Retractable Lip Brush for a more precise application.\nCarry your essentials in style by using this sling bag from Hidesign. It comes with a long strap, which will help you to carry it with ease. It also features one main compartment that will provide you adequate space to keep your stuff in place. Moreover, it has been made of premium quality leather that makes it easy to maintain."]
 
 
+with open("shoppersstop.com_tpdb.txt") as myfile:
+    sample_corpus_2 = []
+    for i in range(5):
+	sample_corpus_2.append(myfile.readline().strip("\n")) 
 
-data, tagged_sentences = create_data_structure(sample_corpus)
+#print(sample_corpus_2)
+
+data, tagged_sentences = create_data_structure(sample_corpus_2)
 
 
 #print(tagged_sentences)
@@ -89,11 +99,13 @@ def get_tags(freq_dict):
 
     return word_to_tag_final
 
-words = ["a", "style", "sleeves"]
+words = raw_input("Type your query separated with space: ")
+words = words.split(" ")
+#words = ["red", "dress"]
 words_index_in_dict = query_words(words, data)
-print(words_index_in_dict)
+#print(words_index_in_dict)
 freq_dict = get_freq_dict(words_index_in_dict, tagged_sentences)
-print(freq_dict)
+#print(freq_dict)
 final_tag = get_tags(freq_dict)
 print(final_tag)
 
