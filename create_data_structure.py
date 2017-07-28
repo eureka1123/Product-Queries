@@ -8,7 +8,7 @@ client = "shoppersstop.com"
 url = "http://pcsync-01/" + client + "/pcf_catalog.json"
 file_request = requests.get(url, stream = True)
 
-username = "xiaoluguo"
+username = "abishkarchhetri"
 root = "/home/" + username + "/Product-Queries/"
 _path_to_model = root +  "stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger" 
 _path_to_jar = root + "stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
