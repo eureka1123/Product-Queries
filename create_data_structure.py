@@ -15,6 +15,7 @@ _path_to_model = root +  "stanford_tagger_files/stanford-postagger-2017-06-09/mo
 _path_to_jar = root + "stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
 tpdb_file_pre = root + client + "_tpdb_pre.txt"
 tpdb_file = root + client + "_tpdb.txt"
+dict_file  = root + client + "_dict.txt"
 
 pool = Pool(4)
 
@@ -36,9 +37,12 @@ for line in file_request.iter_lines():
 f.close()
 
 def check_not_all_capitalized(tokenized):
+    count = 0.0
     for word in tokenized:
         if word.islower():
-            return True
+            count +=1
+    if (count/float(len(tokenized))>.3):
+	return True
     return False
 
 main_data_structure = {}
@@ -46,17 +50,20 @@ sentences_with_tag = []
 
 f = open(tpdb_file, "w").close()
 f = open(tpdb_file, "a")
+p = open(dict_file, "w")
+
 
 def create_data_structure(long_string):
     st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
     sentences = re.split("\. |\n", long_string)
     # print("sentences",sentences)
     for sentence_index in range(len(sentences)):
-        tokenized = nltk.word_tokenize(sentences[sentence_index])
+        print(sentence_index*100.0/float(len(sentences)))
+	tokenized = nltk.word_tokenize(sentences[sentence_index])
         if check_not_all_capitalized(tokenized):
             tagged = st.tag(tokenized)
             sentences_with_tag.append(tagged)
-            print(tagged)
+            #print(tagged)
             f.write(str(tagged).strip('[]'))
             f.write("\n")
 
@@ -75,7 +82,10 @@ def create_data_structure(long_string):
                         main_data_structure[word][sentence_index] =  [word_index]
                     else:
                         main_data_structure[word][sentence_index].append(word_index)
-
+        if sentence_index%100==0:
+            #print(sentences_with_tag)
+            #print(str(main_data_structure))
+	    p.write(str(main_data_structure))
     return (main_data_structure, sentences_with_tag)
 
 with open(tpdb_file_pre) as myfile:
@@ -84,6 +94,8 @@ with open(tpdb_file_pre) as myfile:
 sample_string = "Some things never change. Do they? never"
 
 T = pool.map(create_data_structure(corpus))
+p.write(main_data_structure)
+p.close()
 f.close()
 
 print(data)
