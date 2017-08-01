@@ -16,7 +16,7 @@ _path_to_jar = root + "stanford_tagger_files/stanford-postagger-2017-06-09/stanf
 tpdb_file_pre = root + client + "_tpdb_pre.txt"
 tpdb_file = root + client + "_tpdb.txt"
 dict_file  = root + client + "_dict.txt"
-
+tag_list = ["JJ","JJR","JJS","NN","NNS","NNP","NNPS","VB","VBD","VBG","VBN","VBP","VBZ"]
 pool = Pool(4)
 
 def lazy_json_read_line(line):
@@ -68,15 +68,15 @@ def create_data_structure(long_string):
             f.write("\n")
 
             for word_index in range(len(tagged)):
-                word = tagged[word_index][0]
+                word = tagged[word_index][0].lower()
 
-                if word not in main_data_structure:
+                if word not in main_data_structure and tagged[word_index][1] in tag_list:
                     main_data_structure[word] = {}
                     if sentence_index not in main_data_structure[word]:
                         main_data_structure[word][sentence_index] =  [word_index]
                     else:
                         main_data_structure[word][sentence_index].append(word_index)
-                else:
+                elif tagged[word_index][1] in tag_list:
                     #main_data_structure[word].append((sentence_index, word_index))
                     if sentence_index not in main_data_structure[word]:
                         main_data_structure[word][sentence_index] =  [word_index]
