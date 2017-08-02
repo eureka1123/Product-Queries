@@ -1,17 +1,20 @@
-import ast
-from nltk.tag.stanford import StanfordPOSTagger
-from nltk import word_tokenize
+
+
+# from nltk.tag.stanford import StanfordPOSTagger
+# from nltk import word_tokenize
 import re
+from timer import Timer
 
 # username = "abishkarchhetri"
 # _path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 # _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
 
-_path_to_model = "/Users/abishkarchhetri/Downloads/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
-_path_to_jar = "/Users/abishkarchhetri/Downloads/stanford-postagger-2017-06-09/stanford-postagger.jar"
+# _path_to_model = "/Users/abishkarchhetri/Downloads/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
+# _path_to_jar = "/Users/abishkarchhetri/Downloads/stanford-postagger-2017-06-09/stanford-postagger.jar"
+
+# st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
 
 def create_data_structure(long_string):
-    st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
     main_data_structure = {}
     sentences_with_tag = []
     sentences = re.split("\. |\n", long_string)
@@ -49,17 +52,23 @@ def create_data_structure(long_string):
 # data_file = open("tagged_sentences.txt", "w")
 # data_file.write(str(tagged_sentences))
 
-data = open("shoppersstop.com_dict.txt", "r")
-data = ast.literal_eval(str(data.read()).replace(" ", ""))
+data = open("shoppersstop.com_tpdb_dict.txt", "r")
+data = eval(data.read())
 
 tagged_sentences = open("shoppersstop.com_tpdb.txt", "r")
-tagged_sentences = "["+ str(tagged_sentences.read()).replace("\n",", ")+"', u'NN')"+"]"
-tagged_sentences = eval(tagged_sentences)
+tagged_sentences = str(tagged_sentences.read())
 
-#print(tagged_sentences[0:55])
+# print(tagged_sentences[0:15])
 
 # print("tagged",tagged_sentences)
 # print("data",data)
+
+def tag_word(word):
+    from nltk import pos_tag
+    return pos_tag(word)
+
+def filter_words(words):
+    pass 
 
 def count(TPP_list):
     TPP_to_freq = {}
@@ -139,29 +148,6 @@ def get_max_norm_freq_from_TPP_dict(TPDict):
     return (current_max, max_freq_TPP)
 
 
-def scoring_function_max_freq(word_pairs, list_freq_dict): #make it more efficient
-    word_to_POS = {} #{word: {pos: <tag>, max_freq: <number>}}
-    result = []
-
-    for TPDict in list_freq_dict:
-        score, max_freq_TPP = get_max_from_TPP_dict(TPDict)
-
-        #print("score", score, max_freq_TPP)
-
-        for (word, tag) in max_freq_TPP:
-            if word not in word_to_POS:
-                word_to_POS[word] = {}
-                word_to_POS[word]["POS"] = tag
-                word_to_POS[word]["max_freq"] = score
-            else:
-                if score > word_to_POS[word]["max_freq"]:
-                    word_to_POS[word]["POS"] = tag
-                    word_to_POS[word]["max_freq"] = score
-
-    for word in word_to_POS:
-        result.append((word, word_to_POS[word]["POS"]))
-    return result
-
 def scoring_function_most_likelihood(word_pairs, list_freq_dict): #make it more efficient
     word_to_POS = {} #{word: {pos: <tag>, max_freq: <number>}}
     result = []
@@ -184,61 +170,69 @@ def scoring_function_most_likelihood(word_pairs, list_freq_dict): #make it more 
         result.append((word, word_to_POS[word]["POS"]))
     return result
 
-def scoring_function_all_combi(word_pairs, list_freq_dict): #make it more efficient
-    word_to_POS = {} #{word: {pos: <tag>, max_freq: <number>}}
-    result = []
-
-    for TPDict in list_freq_dict:
-        #freq, max_freq_TPP = get_max_norm_freq_from_TPP_dict(TPDict)
-        for TPPtuple in TPDict:
-            freq = TPDict[TPPtuple]
-            for (word, tag) in TPPtuple:
-                if word not in word_to_POS:
-                    word_to_POS[word] = {}
-                    word_to_POS[word]["POS"] = tag
-                    word_to_POS[word]["freq"] = freq
-                else: #if word in word_to_POS
-                    if tag == word_to_POS[word]["POS"]:
-                        word_to_POS[word]["freq"] += freq
-                    #need to finish
-
-    for word in word_to_POS:
-        result.append((word, word_to_POS[word]["POS"]))
-    #print("freq", freq)
-    return result
-
 def get_tag_complete(data, tagged_sentences, search_words): #need to fix for single word search
-    query = query_words(search_words, data) #returns a big dictionary of all positions of the words in the corpus {style': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
+    
+    with Timer() as t:
+        query = query_words(search_words, data) #returns a big dictionary of all positions of the words in the corpus {'long': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
+    print("=> elasped query: {} s".format(t.secs))
+
+    # query = query_words(search_words, data) #returns a big dictionary of all positions of the words in the corpus {'long': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
     list_of_freq_dict = []
 
+    #print(query)
 
+    
 
     if len(search_words) == 1:
+        print(query)
+        if query[search_words[0]] == None:
+            return tag_word([search_words[0]])
+
         result = score_function_single(search_words, query[search_words[0]], tagged_sentences)
         #print(result)
         return result
-    
-    word_pairs = all_pairs(search_words)
+
+    #search_words, words_not_in_corpus = filter_words(search_words)
+
+
+    with Timer() as t:
+        word_pairs = all_pairs(search_words)
+    print("=> elasped word_pairs: {} s".format(t.secs))
+    #word_pairs = all_pairs(search_words)
 
     for word_1, word_2 in word_pairs:
-        TPP_list = get_TPP(query[word_1],query[word_2], tagged_sentences) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
-            
-        #print("TPP_list",TPP_list)
-        freq_dict = count(TPP_list) #like freq dictionary returns {(t_1, POS_1): 1, (t_2, POS_2) : 3, ...}
+        
+        with Timer() as t:
+            TPP_list = get_TPP(query[word_1],query[word_2], tagged_sentences) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
+        print("=> elasped TPP_list: {} s".format(t.secs))
+        #TPP_list = get_TPP(query[word_1],query[word_2], tagged_sentences) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
+       
+        with Timer() as t:
+            freq_dict = count(TPP_list)
+        print("=> elasped fre_dict: {} s".format(t.secs))
+        #freq_dict = count(TPP_list) #like freq dictionary returns {(t_1, POS_1): 1, (t_2, POS_2) : 3, ...}
 
-        #print(freq_dict)
-        list_of_freq_dict.append(freq_dict)
+        with Timer() as t:
+            list_of_freq_dict.append(freq_dict)
+        print("=> elasped list_of_freq_dict: {} s".format(t.secs))
 
-    #print("freq_dict",list_of_freq_dict)
-    term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict) #returns the tag of word pairs
+        #print("freq dict",freq_dict)
+        #list_of_freq_dict.append(freq_dict)
+
+    #print("list of freq_dict",list_of_freq_dict)
+
+    with Timer() as t:
+        term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict)
+    print("=> elasped term_POS_pairs: {} s".format(t.secs))
+    #term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict) #returns the tag of word pairs
 
     print(term_POS_pairs)
     return term_POS_pairs
 
-# word = raw_file("Enter your search term: ---> ")
-# word = word.split(" ")
+word = raw_input("Enter your search term: ---> ")
+word = word.split(" ")
 
-# get_tag_complete(data, tagged_sentences,word)
+get_tag_complete(data, tagged_sentences,word)
 
 
 
@@ -264,27 +258,21 @@ def get_tag_complete(data, tagged_sentences, search_words): #need to fix for sin
 #                   [("t_A", "p_1"), ("t_C", "p_4"), ("t_D", "p_5")],
 #                   [("t_C", "p_3"), ("t_E", "p_1"), ("t_A", "p_1")]]
 
-# sentence_label_2 = [[("t_A", "p_1"), ("t_B", "p_2")]*5,
-#                   [("t_A", "p_1"), ("t_B", "p_3")]*3,
-#                   [("t_A", "p_2"), ("t_B", "p_4")]*7,
+# sentence_label_2 = [[("t_A", "p_1"), ("t_C", "p_2"), ("t_D", "p_4")]*50000,
+#                   [("t_A", "p_1"), ("t_C", "p_3")]*300000,
+#                   [("t_A", "p_2"), ("t_C", "p_4")]*700000,
 
-#                   [("t_A", "p_1"), ("t_C", "p_2")]*3,
-#                   [("t_A", "p_3"), ("t_C", "p_3")]*4,
+#                   [("t_A", "p_1"), ("t_C", "p_2")]*300000,
+#                   [("t_A", "p_3"), ("t_C", "p_3")]*800000,
 
-#                   [("t_B", "p_1"), ("t_C", "p_2")]*5,
-#                   [("t_B", "p_2"), ("t_C", "p_2")]*5]
-
-# data_2 = get_data_from_label(sentence_label_2)
-
-
-
-# get_tag_complete(data_2, sentence_label_2,["t_A", "t_C", "t_A", "t_B"])
+#                   [("t_B", "p_1"), ("t_C", "p_2"), ("t_D", "p_6")]*50000,
+#                   [("t_B", "p_2"), ("t_C", "p_2")]*500000]
+# with Timer() as t:
+#     data_2 = get_data_from_label(sentence_label_2)
+# print("=> elasped generate_data_dict: {} s".format(t.secs))
 
 
 
-
-
-
-
+# print("result ",get_tag_complete(data_2, sentence_label_2,["t_C", "t_D"]))
 
 
