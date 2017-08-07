@@ -37,7 +37,10 @@ for line in file_request.iter_lines():
 
 f.close()
 
-set_input = (open(tpdb_file_pre, "r").read().split("\n"))
+f = open(tpdb_file_pre, "r")
+set_input = set(f.read().split("\n"))
+f.close()
+
 f1 = open(tpdb_file_filter, "w")
 f1.write('\n'.join(set_input))
 f1.close()
@@ -62,7 +65,6 @@ sentences_with_tag = []
 
 f = open(tpdb_file, "w").close()
 f = open(tpdb_file, "a")
-p = open(dict_file, "w")
 t = open("temp_sentences.txt", "w").close()
 t = open("temp_sentences.txt", "a")
 
@@ -101,14 +103,16 @@ def create_data_structure(long_string):
         if sentence_index%100==0:
             #print(sentences_with_tag)
             #print(str(main_data_structure))
+            p = open(dict_file, "w")
 	    p.write(str(main_data_structure))
+            p.close()
     return (main_data_structure, sentences_with_tag)
 
 with open(tpdb_file_filter) as myfile:
     corpus = myfile.read()
 
 sample_string = "Some things never change. Do they? never"
-
+create_data_structure(corpus)
 T = pool.map(create_data_structure(corpus))
 p.write(main_data_structure)
 p.close()
