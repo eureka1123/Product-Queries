@@ -26,21 +26,12 @@ def create_data_structure(long_string):
 
         for word_index in range(len(tagged)):
             word = tagged[word_index][0]
-
-            if word not in main_data_structure:
-                main_data_structure[word] = {}
-                if sentence_index not in main_data_structure[word]:
-                    main_data_structure[word][sentence_index] =  [word_index]
-                else:
-                    main_data_structure[word][sentence_index].append(word_index)
-            else:
-                #main_data_structure[word].append((sentence_index, word_index))
-                if sentence_index not in main_data_structure[word]:
-                    main_data_structure[word][sentence_index] =  [word_index]
-                else:
-                    main_data_structure[word][sentence_index].append(word_index)
+            word_in_dict = main_data_structure.setdefault(word, {})
+            word_index_list = main_data_structure[word].setdefault(sentence_index, [])
+            word_index_list.append(word_index)
 
     return (main_data_structure, sentences_with_tag)
+
 
 # sample_corpus = "Epitome of orange and trend, this t-shirt is a must-have. the orange color The all over graphical print the orange and trend takes it a notch higher on the orange scale. the orange color it comes with short side-slits and dolman sleeves for an added allure.\nHow To Use: Apply directly onto the lips from the tube or use the Retractable Lip Brush for a more precise application.\nCarry your essentials in style by using this sling bag from Hidesign. It comes with a long strap, which will help you to carry it with ease. It also features one main compartment that will provide you adequate space to keep your stuff in place. Moreover, it has been made of premium quality leather that makes it easy to maintain."
 
