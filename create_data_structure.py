@@ -1,4 +1,5 @@
 from nltk.tag.stanford import StanfordPOSTagger
+from nltk import word_tokenize
 import nltk
 import re
 import requests
@@ -60,6 +61,7 @@ def check_has_verb(tagged):
             return True
     return False
 
+counter = 0
 main_data_structure = {}
 sentences_with_tag = []
 
@@ -69,37 +71,32 @@ t = open("temp_sentences.txt", "w").close()
 t = open("temp_sentences.txt", "a")
 
 def create_data_structure(long_string):
+    global counter
+    global main_data_structure 
+    global sentences_with_tag
     st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
     sentences = re.split("\. |\n", long_string)
-    # print("sentences",sentences)
+    #print("sentences",sentences)
     for sentence_index in range(len(sentences)):
+        #print("counter",counter)
         print(sentence_index*100.0/float(len(sentences)))
-	tokenized = nltk.word_tokenize(sentences[sentence_index])
+        tokenized = word_tokenize(sentences[sentence_index])
         if len(tokenized)!=0 and check_not_all_capitalized(tokenized):
             tagged = st.tag(tokenized)
             if check_has_verb(tagged):
-		t.write(sentences[sentence_index])
+                t.write(sentences[sentence_index])
                 t.write("\n")
                 sentences_with_tag.append(tagged)
-		#print(tagged)
-		f.write(str(tagged).strip('[]'))
-		f.write("\n")
+                #print(tagged)
+                f.write(str(tagged).strip('[]'))
+                f.write("\n")
 
 		for word_index in range(len(tagged)):
 		    word = tagged[word_index][0].lower()
-
-		    if word not in main_data_structure and tagged[word_index][1] in tag_list:
-			main_data_structure[word] = {}
-			if sentence_index not in main_data_structure[word]:
-			    main_data_structure[word][sentence_index] =  [word_index]
-			else:
-			    main_data_structure[word][sentence_index].append(word_index)
-		    elif tagged[word_index][1] in tag_list:
-			#main_data_structure[word].append((sentence_index, word_index))
-			if sentence_index not in main_data_structure[word]:
-			    main_data_structure[word][sentence_index] =  [word_index]
-			else:
-			    main_data_structure[word][sentence_index].append(word_index)
+		    word_in_dict = main_data_structure.setdefault(word, {})
+		    word_index_list = word_in_dict.setdefault(counter, [])
+		    word_index_list.append(word_index)
+                counter+=1 
         if sentence_index%100==0:
             #print(sentences_with_tag)
             #print(str(main_data_structure))
