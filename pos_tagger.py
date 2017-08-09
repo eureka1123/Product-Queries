@@ -4,11 +4,11 @@ import re
 from timer import Timer
 import ast
 
-username = "xiaoluguo"
+username = "abishkarchhetri"
 client = "shoppersstop.com"
 _path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
-root = "/home/" + username + "/"
+root = "/home/" + username + "/Product-Queries/"
 tpdb_file = root + client + "_tpdb.txt"
 dict_file  = root + client + "_dict.txt"
 st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
@@ -44,7 +44,7 @@ def get_max_from_TPP_dict(TPDict):
             max_freq_TPP = entry
     return (current_max, max_freq_TPP)
 
-def score_function_single(search_words, word_query, tagged_sentences):
+def score_function_single( word_query, tagged_sentences):
     word_POS_pairs = []
     for sentence_index in word_query:
         for word_index in word_query[sentence_index]:
@@ -74,12 +74,19 @@ def query_words(list_of_words, main_data_structure):
             result_by_word[word] = find_words(word, main_data_structure)
     return result_by_word
 
-def get_TPP_and_freq(word_1_query,word_2_query, tagged_sentences): #queries: {'a': {0: [9], 1: [7], 3: [19], 5: [3]}, 'style': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
+def get_TPP_and_freq(word_1_query,word_2_query, tagged_sentences, word_list): #queries: {'a': {0: [9], 1: [7], 3: [19], 5: [3]}, 'style': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
     word_1_index_list = word_1_query.keys()
     word_2_index_list = word_2_query.keys()
     word_POS_pairs = []
     common_sentences = set(word_1_index_list) & set(word_2_index_list)
     print("common_sentences", common_sentences)
+    
+    if len(word_1_index_list) != 0 and len(word_2_index_list) != 0 and len(common_sentences) == 0:
+	tag_1 = score_function_single(word_1_query, tagged_sentences)
+	tag_2 = score_function_single( word_2_query, tagged_sentences)
+	print(tag_1, tag_2)
+	return {(tag_1, tag_2):1}
+
     for sentence_index in common_sentences:
         for word_index in word_1_query[sentence_index]:
             for word_2_index in word_2_query[sentence_index]:
@@ -148,7 +155,7 @@ def get_tag_complete(search_words): #need to fix for single word search
             return result 
         print("result", result)
 
-        result.append(score_function_single(search_words, query[search_words[0]], tagged_sentences))
+        result.append(score_function_single( query[search_words[0]], tagged_sentences))
         return result
 
     word_pairs = all_pairs(search_words)
@@ -158,7 +165,7 @@ def get_tag_complete(search_words): #need to fix for single word search
 	# with Timer() as t:
 	#     TPP_list = get_TPP(query[word_1],query[word_2], tagged_sentences) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
 	# print("=> elasped TPP_list: {} s".format(t.secs))
-	freq_dict = get_TPP_and_freq(query[word_1],query[word_2], tagged_sentences) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
+	freq_dict = get_TPP_and_freq(query[word_1],query[word_2], tagged_sentences,[word_1,word_2]) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
 	if len(freq_dict) == 0:
 	    result.append(st.tag(search_words))
             return result
