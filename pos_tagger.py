@@ -28,20 +28,12 @@ def count(TPP_list):
     TPP_to_freq = {}
     TPP_without_distance = map(lambda x : (x[0], x[1]), TPP_list)
     for TPP in TPP_without_distance:
-        if TPP not in TPP_to_freq:
-            TPP_to_freq[TPP] = 1
-        else:
-            TPP_to_freq[TPP] += 1
+	TPP_in_dict = TPP_to_freq.setdefault(TPP, 0)
+        TPP_in_dict += 1
     return TPP_to_freq
 
 def get_max_from_TPP_dict(TPDict):
-    max_freq_TPP = None
-    current_max = 0
-    for entry in TPDict:
-        if TPDict[entry] > current_max:
-            current_max = TPDict[entry]
-            max_freq_TPP = entry
-    return (current_max, max_freq_TPP)
+    return max(TPDict, key=lambda key: TPDict[key])
 
 def score_function_single( word_query, tagged_sentences):
     word_POS_pairs = []
@@ -51,7 +43,7 @@ def score_function_single( word_query, tagged_sentences):
             word_POS_pairs.append(to_add)
 
     TPPDict = count(word_POS_pairs)
-    return get_max_from_TPP_dict(TPPDict)[1]
+    return get_max_from_TPP_dict(TPPDict)
 
 def all_pairs(lst):
     if len(lst) == 1:
