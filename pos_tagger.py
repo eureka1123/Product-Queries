@@ -4,11 +4,11 @@ import re
 from timer import Timer
 import ast
 
-username = "abishkarchhetri"
+username = "xiaoluguo"
 client = "shoppersstop.com"
 _path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
-root = "/home/" + username + "/Product-Queries/"
+root = "/home/" + username +"/"
 tpdb_file = root + client + "_tpdb.txt"
 dict_file  = root + client + "_dict.txt"
 st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
@@ -96,8 +96,9 @@ def get_TPP_and_freq(word_1_query,word_2_query, tagged_sentences, word_list): #q
     # with Timer() as t:
     #     freq_dict = count(TPP_list)
     # print("=> elasped fre_dict: {} s".format(t.secs))
-    freq_dict = count(word_POS_pairs) #like freq dictionary returns {(t_1, POS_1): 1, (t_2, POS_2) : 3, ...}
-    return freq_dict
+    print(word_POS_pairs)
+    #freq_dict = count(word_POS_pairs) #like freq dictionary returns {(t_1, POS_1): 1, (t_2, POS_2) : 3, ...}
+    #return freq_dict
 
 def get_max_norm_freq_from_TPP_dict(TPDict):
     total = float(sum(TPDict.values()))
@@ -165,8 +166,9 @@ def get_tag_complete(search_words): #need to fix for single word search
 	# with Timer() as t:
 	#     TPP_list = get_TPP(query[word_1],query[word_2], tagged_sentences) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
 	# print("=> elasped TPP_list: {} s".format(t.secs))
-	freq_dict = get_TPP_and_freq(query[word_1],query[word_2], tagged_sentences,[word_1,word_2]) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
-	if len(freq_dict) == 0:
+	word_POS_pairs = get_TPP_and_freq(query[word_1],query[word_2], tagged_sentences,[word_1,word_2]) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
+	freq_dict = count(word_POS_pairs)
+        if len(freq_dict) == 0:
 	    result.append(st.tag(search_words))
             return result
 
