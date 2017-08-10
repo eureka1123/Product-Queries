@@ -1,7 +1,6 @@
 from nltk.tag.stanford import StanfordPOSTagger
 from nltk import word_tokenize
 import re
-from timer import Timer
 import ast
 
 username = "xiaoluguo"
@@ -131,16 +130,10 @@ def scoring_function_most_likelihood(word_pairs, list_freq_dict): #make it more 
 
 def get_tag_complete(search_words): #need to fix for single word search
 
-    # with Timer() as t:
-    #     query = query_words(search_words, data) #returns a big dictionary of all positions of the words in the corpus {'long': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
-    # print("=> elasped query: {} s".format(t.secs))
     query = query_words(search_words, data) #returns a big dictionary of all positions of the words in the corpus {'long': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
     list_of_freq_dict = []
 
     #print(query)
-    # with Timer() as t:
-    #     word_pairs = all_pairs(search_words)
-    # print("=> elasped word_pairs: {} s".format(t.secs))
     search_words_temp = search_words
     search_words = [x for x in search_words if query[x] is not None]
     other_words = [x for x in search_words_temp if query[x] is None] 
@@ -163,25 +156,17 @@ def get_tag_complete(search_words): #need to fix for single word search
     
     for word_1, word_2 in word_pairs:
         
-	# with Timer() as t:
-	#     TPP_list = get_TPP(query[word_1],query[word_2], tagged_sentences) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
-	# print("=> elasped TPP_list: {} s".format(t.secs))
 	word_POS_pairs = get_TPP_and_freq(query[word_1],query[word_2], tagged_sentences,[word_1,word_2]) #only gets consecutive pairs and their tag [(t_1, POS_1), (t_2, POS_2), ...]
 	freq_dict = count(word_POS_pairs)
         if len(freq_dict) == 0:
-	    result.append(st.tag(search_words))
-            return result
+	    st_tag = st.tag([word_1, word_2])
+            list_of_freq_dict.append({st_tag:.5})
+	    continue
 
-	# with Timer() as t:
-	#     list_of_freq_dict.append(freq_dict)
-	# print("=> elasped list_of_freq_dict: {} s".format(t.secs))
 
 	list_of_freq_dict.append(freq_dict)
 
-    with Timer() as t:
-	term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict)
-    print("=> elasped term_POS_pairs: {} s".format(t.secs))
-    #term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict) #returns the tag of word pairs
+    term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict) #returns the tag of word pairs
     result.append(term_POS_pairs)
     return result
 
