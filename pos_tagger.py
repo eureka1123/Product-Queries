@@ -3,11 +3,11 @@ from nltk import word_tokenize
 import re
 import ast
 
-username = "xiaoluguo"
+username = "abishkarchhetri"
 client = "shoppersstop.com"
 _path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
-root = "/home/" + username +"/"
+root = "/home/" + username +"/Product-Queries/"
 tpdb_file = root + client + "_tpdb.txt"
 dict_file  = root + client + "_dict.txt"
 st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
@@ -53,16 +53,11 @@ def all_pairs(lst):
         return_list.append((lst[i], lst[i+1]))
     return return_list
 
-def find_words(word, main_data_structure):
-    if word in main_data_structure:
-        return main_data_structure[word]
-    return None
-
 def query_words(list_of_words, main_data_structure):
     result_by_word = {}
     for word in list_of_words:
         if word not in result_by_word:
-            result_by_word[word] = find_words(word, main_data_structure)
+            result_by_word[word] = main_data_structure.get(word)
     return result_by_word
 
 def get_TPP_and_freq(word_1_query,word_2_query, tagged_sentences, word_list): #queries: {'a': {0: [9], 1: [7], 3: [19], 5: [3]}, 'style': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
@@ -122,7 +117,7 @@ def get_tag_complete(search_words): #need to fix for single word search
     query = query_words(search_words, data) #returns a big dictionary of all positions of the words in the corpus {'long': {0: [2], 1: [12], 4: [4]}, 'sleeves': {2: [7]}}
     list_of_freq_dict = []
 
-    #print(query)
+    print(query.keys())
     search_words_temp = search_words[:]
     search_words = [x for x in search_words if query[x] is not None]
     other_words = [x for x in search_words_temp if query[x] is None] 
