@@ -92,10 +92,7 @@ def get_TPP_and_freq(word_1_query,word_2_query, tagged_sentences, word_list): #q
                 distance = abs(word_index- word_2_index)
                 to_add = ((tagged_sentences[sentence_index][word_index][0].lower(),tagged_sentences[sentence_index][word_index][1]), (tagged_sentences[sentence_index][word_2_index][0].lower(),tagged_sentences[sentence_index][word_2_index][1]), distance)
                 word_POS_pairs.append(to_add)
-    # with Timer() as t:
-    #     freq_dict = count(TPP_list)
-    # print("=> elasped fre_dict: {} s".format(t.secs))
-    print(word_POS_pairs)
+    
     #freq_dict = count(word_POS_pairs) #like freq dictionary returns {(t_1, POS_1): 1, (t_2, POS_2) : 3, ...}
     #return freq_dict
 
@@ -134,7 +131,7 @@ def get_tag_complete(search_words): #need to fix for single word search
     list_of_freq_dict = []
 
     #print(query)
-    search_words_temp = search_words
+    search_words_temp = search_words[:]
     search_words = [x for x in search_words if query[x] is not None]
     other_words = [x for x in search_words_temp if query[x] is None] 
     
