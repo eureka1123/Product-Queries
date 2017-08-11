@@ -36,7 +36,7 @@ def score_function_single( word_query, tagged_sentences):
     word_POS_pairs = []
     for sentence_index in word_query:
         for word_index in word_query[sentence_index]:
-            to_add = tagged_sentences[sentence_index][word_index]
+            to_add = (tagged_sentences[sentence_index][word_index][0].lower(),tagged_sentences[sentence_index][word_index][1])
             word_POS_pairs.append(to_add)
 
     TPPDict = count(word_POS_pairs)
@@ -145,7 +145,6 @@ def get_tag_complete(search_words): #need to fix for single word search
 	    term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict) #returns the tag of word pairs
 	    result.extend(term_POS_pairs)
 	    continue
-  
         for x in word_POS_pairs:
             if x[2]==1:
                 word_POS_pairs_A.append(x)
@@ -153,11 +152,9 @@ def get_tag_complete(search_words): #need to fix for single word search
                 word_POS_pairs_B.append(x)
         freq_dict_A = count(word_POS_pairs_A)
         freq_dict_B = count(word_POS_pairs_B)
-        
         if len(freq_dict_B) == 0 and len(freq_dict_A) == 0:
             st_tag = st.tag([word_1, word_2])
             list_of_freq_dict_B.append({st_tag[0]:.5})
-        
         if len(freq_dict_A)!=0:
             list_of_freq_dict_A.append(freq_dict_A)
         if len(freq_dict_B)!=0:
@@ -165,11 +162,9 @@ def get_tag_complete(search_words): #need to fix for single word search
         
     term_POS_pairs_A = []
     term_POS_pairs_A_first = []
-    print("result",result)
     if len(list_of_freq_dict_A)!= 0:
 	term_POS_pairs_A = scoring_function_most_likelihood(word_pairs, list_of_freq_dict_A) #returns the tag of word pairs
 	result.extend(term_POS_pairs_A)
-    print("result_1", result)
     results_first = [x[0] for x in result]
     term_POS_pairs_A_first = [x[0] for x in term_POS_pairs_A if x[0] not in results_first]
     term_POS_pairs_B = scoring_function_most_likelihood(word_pairs, list_of_freq_dict_B)
