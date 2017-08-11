@@ -119,11 +119,11 @@ def get_tag_complete(search_words): #need to fix for single word search
     
     result =[]
     if len(other_words)!=0:
-        result.append(st.tag(other_words))
+        result.extend(st.tag(other_words))
     
     if len(search_words) == 1:
         if query[search_words[0]] == None:
-            result.append(st.tag([search_words[0]]))
+            result.extend(st.tag([search_words[0]]))
             return result 
 
         result.append(score_function_single( query[search_words[0]], tagged_sentences))
@@ -143,7 +143,7 @@ def get_tag_complete(search_words): #need to fix for single word search
             list_of_freq_dict.append(freq_dict)
 
 	    term_POS_pairs = scoring_function_most_likelihood(word_pairs, list_of_freq_dict) #returns the tag of word pairs
-	    result.append(term_POS_pairs)
+	    result.extend(term_POS_pairs)
 	    continue
   
         for x in word_POS_pairs:
@@ -165,17 +165,21 @@ def get_tag_complete(search_words): #need to fix for single word search
         
     term_POS_pairs_A = []
     term_POS_pairs_A_first = []
+    print("result",result)
     if len(list_of_freq_dict_A)!= 0:
 	term_POS_pairs_A = scoring_function_most_likelihood(word_pairs, list_of_freq_dict_A) #returns the tag of word pairs
-	result.append(term_POS_pairs_A)
+	result.extend(term_POS_pairs_A)
+    print("result_1", result)
     results_first = [x[0] for x in result]
     term_POS_pairs_A_first = [x[0] for x in term_POS_pairs_A if x[0] not in results_first]
     term_POS_pairs_B = scoring_function_most_likelihood(word_pairs, list_of_freq_dict_B)
-    result.append([x for x in term_POS_pairs_B if x[0] not in term_POS_pairs_A_first and x[0] not in results_first])
+    result.extend([x for x in term_POS_pairs_B if x[0] not in term_POS_pairs_A_first and x[0] not in results_first])
     return result
 
 while True:
     word = raw_input("Enter your search term: ---> ")
+    if word == "":
+        continue
     word = [item.lower() for item in word.split(" ")]
 
     print(get_tag_complete(word))
