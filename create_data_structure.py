@@ -23,7 +23,7 @@ pool = Pool(4)
 
 def lazy_json_read_line(line):
     try:
-        line_json = json.loads(line[line.index("{"):len(line)-1])
+        line_json = json.loads(line[line.index("{"):-1])
         line_description = line_json["description"]
         return line_description
     except:

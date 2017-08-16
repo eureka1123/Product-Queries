@@ -18,7 +18,7 @@ data_read.close()
 
 tagged_sentences_read = open(tpdb_file, "r")
 tagged_sentences_temp = tagged_sentences_read.read().split("\n")
-del tagged_sentences_temp[len(tagged_sentences_temp)-1]
+del tagged_sentences_temp[-1]
 tagged_sentences = []
 for i in range(len(tagged_sentences_temp)):
     tagged_sentences.append([x for x in ast.literal_eval(tagged_sentences_temp[i])])
