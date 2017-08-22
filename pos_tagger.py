@@ -7,7 +7,7 @@ username = "xiaoluguo"
 client = "shoppersstop.com"
 _path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
-root = "/home/" + username +"/"
+root = "/home/" + username +"/Product-Queries/"
 tpdb_file = root + client + "_tpdb.txt"
 dict_file  = root + client + "_dict.txt"
 st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
@@ -75,7 +75,7 @@ def get_TPP_and_freq(word_1_query,word_2_query, tagged_sentences, word_list): #q
                 distance = abs(word_index- word_2_index)
                 to_add = ((tagged_sentences[sentence_index][word_index][0].lower(),tagged_sentences[sentence_index][word_index][1]), (tagged_sentences[sentence_index][word_2_index][0].lower(),tagged_sentences[sentence_index][word_2_index][1]), distance)
                 word_POS_pairs.append(to_add)
-   
+    print("word_POS_pairs", word_POS_pairs) 
     return(word_POS_pairs) 
     #freq_dict = count(word_POS_pairs) #like freq dictionary returns {(t_1, POS_1): 1, (t_2, POS_2) : 3, ...}
     #return freq_dict
