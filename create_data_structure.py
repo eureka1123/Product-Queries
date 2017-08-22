@@ -5,8 +5,9 @@ import re
 import requests
 import json
 from multiprocessing.pool import ThreadPool as Pool
+import nlpnet
 
-client = "shoppersstop.com"
+client = "ebay.in"
 url = "http://pcsync-01/" + client + "/pcf_catalog.json"
 file_request = requests.get(url, stream = True)
 
@@ -19,7 +20,7 @@ tpdb_file_filter = root + client + "_tpdb_filter.txt"
 tpdb_file = root + client + "_tpdb.txt"
 dict_file  = root + client + "_dict.txt"
 tag_list = ["JJ","JJR","JJS","NN","NNS","NNP","NNPS","VB","VBD","VBG","VBN","VBP","VBZ"]
-pool = Pool(4)
+#pool = Pool(4)
 
 def lazy_json_read_line(line):
     try:
@@ -32,9 +33,16 @@ def lazy_json_read_line(line):
 f = open(tpdb_file_pre, "w").close()
 f = open(tpdb_file_pre, "a")
 
+counter = 1.0
 for line in file_request.iter_lines():
-    f.write(lazy_json_read_line(line))
-    f.write("\n")
+    print(counter/len(file_request.iter_lines()))
+    counter+=1
+    try:
+        f.write(lazy_json_read_line(line).replace("\n",""))
+        f.write("\n")
+    except:
+        pass
+        #print(lazy_json_read_line(line))
 
 f.close()
 
@@ -57,6 +65,7 @@ def check_not_all_capitalized(tokenized):
 
 def check_has_verb(tagged):
     for word in tagged:
+        #print(word, word[1])
         if word[1] in ["VB","VBD","VBG","VBN","VBP","VBZ"]:
             return True
     return False
@@ -75,6 +84,7 @@ def create_data_structure(long_string):
     global main_data_structure 
     global sentences_with_tag
     st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
+    tagger = nlpnet.POSTagger("/mnt/static/nlpnet-en", language ="en")
     sentences = re.split("\. |\n", long_string)
     #print("sentences",sentences)
     for sentence_index in range(len(sentences)):
@@ -82,7 +92,7 @@ def create_data_structure(long_string):
         print(sentence_index*100.0/float(len(sentences)))
         tokenized = word_tokenize(sentences[sentence_index])
         if len(tokenized)!=0 and check_not_all_capitalized(tokenized):
-            tagged = st.tag(tokenized)
+            tagged = st.tag(sentences[sentence_index])
             if check_has_verb(tagged):
                 t.write(sentences[sentence_index])
                 t.write("\n")
@@ -90,14 +100,13 @@ def create_data_structure(long_string):
                 #print(tagged)
                 f.write(str(tagged).strip('[]'))
                 f.write("\n")
-
 		for word_index in range(len(tagged)):
 		    word = tagged[word_index][0].lower()
 		    word_in_dict = main_data_structure.setdefault(word, {})
 		    word_index_list = word_in_dict.setdefault(counter, [])
 		    word_index_list.append(word_index)
                 counter+=1 
-        if sentence_index%100==0:
+        if sentence_index%1000==0:
             #print(sentences_with_tag)
             #print(str(main_data_structure))
             p = open(dict_file, "w")
@@ -109,11 +118,10 @@ with open(tpdb_file_filter) as myfile:
     corpus = myfile.read()
 
 sample_string = "Some things never change. Do they? never"
-create_data_structure(corpus)
-T = pool.map(create_data_structure(corpus))
-p.write(main_data_structure)
+main_data_structure, sentences_with_tag = create_data_structure(corpus)
+#T = pool.map(create_data_structure(corpus))
+p = open(dict_file, "w")
+p.write(str(main_data_structure))
 p.close()
 f.close()
 t.close()
-print(data)
-print(sentences)
