@@ -7,9 +7,9 @@ username = "xiaoluguo"
 client = "shoppersstop.com"
 _path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
-root = "/home/" + username +"/Product-Queries/"
-tpdb_file = root + "copy_" + client + "_tpdb.txt"
-dict_file  = root + "copy_" + client + "_dict.txt"
+root = "/mnt/data/"
+tpdb_file = root + client + "_tpdb.txt"
+dict_file  = root + client + "_dict.txt"
 st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
 
 data_read = open(dict_file, "r")
