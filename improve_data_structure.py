@@ -39,5 +39,3 @@ for i in range(len(tagged_sentences)):
     t.write(str(tagged_sentences[i]).strip('[]'))
     t.write("\n")
 
-t.write(str(tagged_sentences).strip('[]'))
-
