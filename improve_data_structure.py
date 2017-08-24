@@ -1,16 +1,11 @@
-from nltk.tag.stanford import StanfordPOSTagger
-from nltk import word_tokenize
 import re
 import ast
 
 username = "xiaoluguo"
 client = "ebay.in"
-_path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
-_path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
 root = "/mnt/data/pos_" + client + "/"
 tpdb_file = root + client + "_tpdb.txt"
 dict_file  = root + client + "_dict.txt"
-st = StanfordPOSTagger(model_filename=_path_to_model, path_to_jar=_path_to_jar)
 
 data_read = open(dict_file, "r")
 data = ast.literal_eval(data_read.read())
@@ -30,12 +25,12 @@ for k in data.keys():
     print(counter/len(data))
     if len(data[k]) == 1:
        for s in data[k].keys():
-           tagged_sentences[s] == ""
+           tagged_sentences[int(s)] == "()"
        del data[k]
 
-d = open(dict_file+"1", "w")
+d = open(root+client+"new_dict.txt", "w")
 d.write(str(data))
 
-t = open(tpdb_file+"1", "w")
+t = open(root+client+"new_tpdb.txt", "w")
 t.write(str(tagged_sentences))
 

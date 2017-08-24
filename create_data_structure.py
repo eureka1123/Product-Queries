@@ -27,6 +27,7 @@ try:
     popen('mkdir ' + root1)
 except:
     pass
+
 def lazy_json_read_line(line):
     try:
         line_json = json.loads(line[line.index("{"):-1])
