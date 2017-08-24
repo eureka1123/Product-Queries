@@ -19,7 +19,8 @@ _path_to_jar = root + "stanford_tagger_files/stanford-postagger-2017-06-09/stanf
 tpdb_file_pre = root1 + client + "_tpdb_pre.txt"
 tpdb_file_filter = root1 + client + "_tpdb_filter.txt"
 tpdb_file = root1 + client + "_tpdb.txt"
-dict_file  = root1 + client + "_dict.txt"
+dict_file = root1 + client + "_dict.txt"
+temp_sentences = root1 + client + "_temp_sentences.txt"
 tag_list = ["JJ","JJR","JJS","NN","NNS","NNP","NNPS","VB","VBD","VBG","VBN","VBP","VBZ"]
 
 try:
@@ -75,8 +76,8 @@ sentences_with_tag = []
 
 f = open(tpdb_file, "w").close()
 f = open(tpdb_file, "a")
-t = open("temp_sentences.txt", "w").close()
-t = open("temp_sentences.txt", "a")
+t = open(temp_sentences, "w").close()
+t = open(temp_sentences, "a")
 
 def create_data_structure(long_string):
     global counter
