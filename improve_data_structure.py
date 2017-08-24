@@ -23,14 +23,21 @@ tagged_sentences_read.close()
 counter = 1.0
 for k in data.keys():
     print(counter/len(data))
+    counter+=1
     if len(data[k]) == 1:
        for s in data[k].keys():
-           tagged_sentences[int(s)] == "()"
+           tagged_sentences[int(s)] == ["IGNORE"]
        del data[k]
 
 d = open(root+client+"new_dict.txt", "w")
 d.write(str(data))
 
-t = open(root+client+"new_tpdb.txt", "w")
-t.write(str(tagged_sentences))
+t = open(root+client+"new_tpdb.txt", "w").close()
+t = open(root+client+"new_tpdb.txt", "a")
+
+for i in range(len(tagged_sentences)):
+    t.write(str(tagged_sentences[i]).strip('[]'))
+    t.write("\n")
+
+t.write(str(tagged_sentences).strip('[]'))
 
