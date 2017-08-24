@@ -32,9 +32,10 @@ for k in data.keys():
        for s in data[k].keys():
            tagged_sentences[s] == ""
        del data[k]
+
 d = open(dict_file+"1", "w")
-d.write(data)
+d.write(str(data))
 
 t = open(tpdb_file+"1", "w")
-t.write(tagged_sentences)
+t.write(str(tagged_sentences))
 
