@@ -1,3 +1,4 @@
+from os import popen
 from nltk.tag.stanford import StanfordPOSTagger
 from nltk import word_tokenize
 import nltk
@@ -6,7 +7,7 @@ import requests
 import json
 import nlpnet
 
-client = "ebay.in"
+client = "shoppersstop.com"
 url = "http://pcsync-01/" + client + "/pcf_catalog.json"
 file_request = requests.get(url, stream = True)
 
@@ -21,33 +22,37 @@ tpdb_file = root1 + client + "_tpdb.txt"
 dict_file  = root1 + client + "_dict.txt"
 tag_list = ["JJ","JJR","JJS","NN","NNS","NNP","NNPS","VB","VBD","VBG","VBN","VBP","VBZ"]
 
-#def lazy_json_read_line(line):
-#    try:
-#        line_json = json.loads(line[line.index("{"):-1])
-#        line_description = line_json["description"]
-#        return line_description
-#    except:
-#        return "error"
-#
-#f = open(tpdb_file_pre, "w").close()
-#f = open(tpdb_file_pre, "a")
-#
-#for line in file_request.iter_lines():
-#    try:
-#        f.write(lazy_json_read_line(line).replace("\n",""))
-#        f.write("\n")
-#    except:
-#        pass
-#
-#f.close()
-#
-#f = open(tpdb_file_pre, "r")
-#set_input = set(f.read().split("\n"))
-#f.close()
-#
-#f1 = open(tpdb_file_filter, "w")
-#f1.write('\n'.join(set_input))
-#f1.close()
+try:
+    popen('mkdir ' + root1)
+except:
+    pass
+def lazy_json_read_line(line):
+    try:
+        line_json = json.loads(line[line.index("{"):-1])
+        line_description = line_json["description"]
+        return line_description
+    except:
+        return "error"
+
+f = open(tpdb_file_pre, "w").close()
+f = open(tpdb_file_pre, "a")
+
+for line in file_request.iter_lines():
+    try:
+        f.write(lazy_json_read_line(line).replace("\n",""))
+        f.write("\n")
+    except:
+        pass
+
+f.close()
+
+f = open(tpdb_file_pre, "r")
+set_input = set(f.read().split("\n"))
+f.close()
+
+f1 = open(tpdb_file_filter, "w")
+f1.write('\n'.join(set_input))
+f1.close()
 
 def check_not_all_capitalized(tokenized):
     count = 0.0
