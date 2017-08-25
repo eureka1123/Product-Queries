@@ -20,20 +20,17 @@ for i in range(len(tagged_sentences_temp)):
     tagged_sentences.append([x for x in ast.literal_eval(tagged_sentences_temp[i])])
 tagged_sentences_read.close()
 
-counter = 1.0
 for k in data.keys():
-    print(counter/len(data))
-    counter+=1
-    if len(data[k]) == 1:
+    if len(data[k]) < 5:
        for s in data[k].keys():
-           tagged_sentences[int(s)] == ["IGNORE"]
+           tagged_sentences[s] = ["IGNORE"]
        del data[k]
 
-d = open(root+client+"new_dict.txt", "w")
+d = open(dict_file, "w")
 d.write(str(data))
 
-t = open(root+client+"new_tpdb.txt", "w").close()
-t = open(root+client+"new_tpdb.txt", "a")
+t = open(tpdb_file, "w").close()
+t = open(tpdb_file, "a")
 
 for i in range(len(tagged_sentences)):
     t.write(str(tagged_sentences[i]).strip('[]'))
