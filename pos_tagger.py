@@ -4,7 +4,7 @@ import re
 import ast
 
 username = "xiaoluguo"
-client = "ebay.in"
+client = "shoppersstop.com"
 _path_to_model = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger"
 _path_to_jar = "/home/" + username+ "/Product-Queries/stanford_tagger_files/stanford-postagger-2017-06-09/stanford-postagger.jar"
 root = "/mnt/data/pos_" + client + "/"
@@ -34,13 +34,10 @@ def count(TPP_list):
 
 def score_function_single(word_query, tagged_sentences):
     word_POS_pairs = []
-    try:
-        for sentence_index in word_query:
-            for word_index in word_query[sentence_index]:
-                to_add = (tagged_sentences[sentence_index][word_index][0].lower(),tagged_sentences[sentence_index][word_index][1])
-                word_POS_pairs.append(to_add)
-    except:
-        pass
+    for sentence_index in word_query:
+        for word_index in word_query[sentence_index]:
+            to_add = (tagged_sentences[sentence_index][word_index][0].lower(),tagged_sentences[sentence_index][word_index][1])
+            word_POS_pairs.append(to_add)
 
     TPPDict = count(word_POS_pairs)
     return max(TPPDict, key=lambda key: TPPDict[key])
@@ -71,15 +68,12 @@ def get_TPP_and_freq(word_1_query,word_2_query, tagged_sentences, word_list): #q
 	tag_1 = score_function_single(word_1_query, tagged_sentences)
 	tag_2 = score_function_single(word_2_query, tagged_sentences)
 	return [(tag_1, tag_2,2)]
-    try:
-        for sentence_index in common_sentences:
-            for word_index in word_1_query[sentence_index]:
-                for word_2_index in word_2_query[sentence_index]:
-                    distance = abs(word_index- word_2_index)
-                    to_add = ((tagged_sentences[sentence_index][word_index][0].lower(),tagged_sentences[sentence_index][word_index][1]), (tagged_sentences[sentence_index][word_2_index][0].lower(),tagged_sentences[sentence_index][word_2_index][1]), distance)
-                    word_POS_pairs.append(to_add)
-    except:
-        pass
+    for sentence_index in common_sentences:
+        for word_index in word_1_query[sentence_index]:
+            for word_2_index in word_2_query[sentence_index]:
+                distance = abs(word_index- word_2_index)
+                to_add = ((tagged_sentences[sentence_index][word_index][0].lower(),tagged_sentences[sentence_index][word_index][1]), (tagged_sentences[sentence_index][word_2_index][0].lower(),tagged_sentences[sentence_index][word_2_index][1]), distance)
+                word_POS_pairs.append(to_add)
     print("word_POS_pairs", word_POS_pairs) 
     return(word_POS_pairs) 
     #freq_dict = count(word_POS_pairs) #like freq dictionary returns {(t_1, POS_1): 1, (t_2, POS_2) : 3, ...}
@@ -142,6 +136,7 @@ def get_tag_complete(search_words): #need to fix for single word search
         if len(word_pairs) ==1:
             freq_dict = count(word_POS_pairs)
 	    if len(freq_dict) == 0:
+		print(word_1,word_2)
 		st_tag = st.tag([word_1, word_2])
 		list_of_freq_dict.append({st_tag[0]:.5})
 		continue

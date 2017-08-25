@@ -20,11 +20,17 @@ for i in range(len(tagged_sentences_temp)):
     tagged_sentences.append([x for x in ast.literal_eval(tagged_sentences_temp[i])])
 tagged_sentences_read.close()
 
+removed =[]
+
 for k in data.keys():
     if len(data[k]) < 10:
-       for s in data[k].keys():
-           tagged_sentences[s] = ["IGNORE"]
-       del data[k]
+        for s in data[k].keys():
+            removed += s
+            tagged_sentences[s] = ["IGNORE"]
+        del data[k]
+    for s in data[k].keys():
+        if s in removed:
+            del data[k][s]   
 
 d = open(dict_file, "w")
 d.write(str(data))
