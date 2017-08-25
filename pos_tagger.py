@@ -1,3 +1,5 @@
+#inspired by http://www.lsc.cs.titech.ac.jp/keyaki/paper/SAC2017_Keyaki_cameraReady.pdf
+
 from nltk.tag.stanford import StanfordPOSTagger
 from nltk import word_tokenize
 import re
