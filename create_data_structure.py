@@ -113,7 +113,6 @@ def create_data_structure(long_string):
 with open(tpdb_file_filter) as myfile:
     corpus = myfile.read()
 
-sample_string = "Some things never change. Do they? never"
 main_data_structure, sentences_with_tag = create_data_structure(corpus)
 p = open(dict_file, "w")
 p.write(str(main_data_structure))
