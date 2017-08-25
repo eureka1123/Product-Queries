@@ -21,7 +21,7 @@ for i in range(len(tagged_sentences_temp)):
 tagged_sentences_read.close()
 
 for k in data.keys():
-    if len(data[k]) < 5:
+    if len(data[k]) < 10:
        for s in data[k].keys():
            tagged_sentences[s] = ["IGNORE"]
        del data[k]
